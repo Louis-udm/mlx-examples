@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "mlx-examples"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+einops = "^0.7.0"
+mlx = "^0.0.5"
+numpy = "^1.26.2"
+transformers = ">=4.35"
+torch = "^2.1.2"
+sentencepiece = "^0.1.99"
+hf-transfer = "^0.1.4"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

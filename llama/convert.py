@@ -129,9 +129,13 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+    # args.model_name="tiny_llama"
+    # args.model_path="TinyLlama/TinyLlama-1.1B-python-v0.1"
 
     model_path = Path(args.model_path)
     weights, params = globals()[args.model_name](model_path)
+    model_path = Path(args.model_path+"-converted")
+    model_path.mkdir(parents=True, exist_ok=True)
     np.savez(str(model_path / "weights.npz"), **weights)
     if params is not None:
         with open(model_path / "params.json", "w") as fid:
