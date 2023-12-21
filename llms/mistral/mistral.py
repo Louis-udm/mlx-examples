@@ -1,15 +1,15 @@
 # Copyright © 2023 Apple Inc.
 
 import argparse
-from dataclasses import dataclass
 import json
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Tuple, List
-from sentencepiece import SentencePieceProcessor
+from typing import List, Optional, Tuple
 
 import mlx.core as mx
 import mlx.nn as nn
 from mlx.utils import tree_map, tree_unflatten
+from sentencepiece import SentencePieceProcessor
 
 
 @dataclass
@@ -192,9 +192,10 @@ class Tokenizer:
 def load_model(folder: str, dtype=mx.float16):
     model_path = Path(folder)
     tokenizer = Tokenizer(str(model_path / "tokenizer.model"))
-    with open(model_path / "params.json", "r") as f:
+    with open(model_path / "config.json", "r") as f:
         config = json.loads(f.read())
-        config.pop("sliding_window")
+        config.pop("sliding_window", None)
+        config.pop("model_type", None)
         model_args = ModelArgs(**config)
     weights = mx.load(str(model_path / "weights.npz"))
     weights = tree_unflatten(list(weights.items()))
@@ -224,7 +225,7 @@ def generate(prompt: mx.array, model: Mistral, temp: Optional[float] = 0.0):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Mistral inference script")
     parser.add_argument(
-        "--model_path",
+        "--model-path",
         type=str,
         default="mistral-7B-v0.1",
         help="The path to the model weights and tokenizer",

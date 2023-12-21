@@ -1,16 +1,16 @@
 # Copyright © 2023 Apple Inc.
 
 import argparse
-from dataclasses import dataclass
 import json
-from pathlib import Path
-from typing import Optional, Tuple, List
-from sentencepiece import SentencePieceProcessor
 import time
+from dataclasses import dataclass
+from pathlib import Path
+from typing import List, Optional, Tuple
 
 import mlx.core as mx
 import mlx.nn as nn
 from mlx.utils import tree_unflatten
+from sentencepiece import SentencePieceProcessor
 
 
 @dataclass
@@ -329,8 +329,9 @@ def few_shot_generate(args):
 def load_model(model_path):
     model_path = Path(model_path)
     weights = mx.load(str(model_path / "weights.npz"))
-    with open(model_path / "params.json", "r") as f:
+    with open(model_path / "config.json", "r") as f:
         config = json.loads(f.read())
+        config.pop("model_type", None)
         n_heads = config["n_heads"]
         if "n_kv_heads" not in config:
             config["n_kv_heads"] = n_heads

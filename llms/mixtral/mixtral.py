@@ -1,17 +1,17 @@
 # Copyright © 2023 Apple Inc.
 
 import argparse
-from dataclasses import dataclass
 import glob
 import json
-import numpy as np
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Optional, Tuple, List
-from sentencepiece import SentencePieceProcessor
+from typing import List, Optional, Tuple
 
 import mlx.core as mx
 import mlx.nn as nn
+import numpy as np
 from mlx.utils import tree_map, tree_unflatten
+from sentencepiece import SentencePieceProcessor
 
 
 @dataclass
@@ -247,8 +247,9 @@ class Tokenizer:
 def load_model(folder: str, dtype=mx.float16):
     model_path = Path(folder)
     tokenizer = Tokenizer(str(model_path / "tokenizer.model"))
-    with open("params.json", "r") as f:
+    with open(model_path / "config.json", "r") as f:
         config = json.loads(f.read())
+        config.pop("model_type", None)
         model_args = ModelArgs(**config)
     weight_files = glob.glob(str(model_path / "weights.*.npz"))
     weights = {}
@@ -281,7 +282,7 @@ def generate(prompt: mx.array, model: Mixtral, temp: Optional[float] = 0.0):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Mixtral inference script")
     parser.add_argument(
-        "--model_path",
+        "--model-path",
         type=str,
         default="Mixtral-8x7B-v0.1",
         help="The path to the model weights, tokenizer, and config",

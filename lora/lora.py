@@ -3,19 +3,17 @@
 import argparse
 import json
 import math
-import numpy as np
-from pathlib import Path
-from sentencepiece import SentencePieceProcessor
 import time
-from typing import Optional, Tuple, List
+from pathlib import Path
+from typing import List, Optional, Tuple
 
 import mlx.core as mx
 import mlx.nn as nn
 import mlx.optimizers as optim
-from mlx.utils import tree_map, tree_flatten, tree_unflatten
-
-
-from models import ModelArgs, Model, LoRALinear
+import numpy as np
+from mlx.utils import tree_flatten, tree_map, tree_unflatten
+from models import LoRALinear, Model, ModelArgs
+from sentencepiece import SentencePieceProcessor
 
 
 def build_parser():
@@ -211,6 +209,10 @@ def iterate_batches(dset, tokenizer, batch_size, train=False):
                 for j in range(batch_size)
             ]
             lengths = [len(x) for x in batch]
+            
+            # Check if any sequence is longer than 2048 tokens
+            if max(lengths) > 2048:
+                print("Warning: Some sequences are longer than 2048 tokens. Consider pre-splitting your data to save memory.")
 
             # Pad to the max length
             batch_arr = np.zeros((batch_size, max(lengths)), np.int32)
@@ -332,9 +334,9 @@ def load_model(folder: str, dtype=mx.float16):
     tokenizer = Tokenizer(str(model_path / "tokenizer.model"))
     with open(model_path / "params.json", "r") as f:
         config = json.loads(f.read())
-        model_args = ModelArgs(**config)
         if config.get("vocab_size", -1) < 0:
             config["vocab_size"] = tokenizer.vocab_size
+        model_args = ModelArgs(**config)
     weights = mx.load(str(model_path / "weights.npz"))
     weights = tree_unflatten(list(weights.items()))
     weights = tree_map(lambda p: p.astype(dtype), weights)

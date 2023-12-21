@@ -3,8 +3,9 @@
 import argparse
 import glob
 import json
-import numpy as np
 from pathlib import Path
+
+import numpy as np
 import torch
 
 
@@ -33,7 +34,7 @@ def convert(k, v, config):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Convert Mixtral weights to MLX.")
     parser.add_argument(
-        "--model_path",
+        "--model-path",
         type=str,
         default="Mixtral-8x7B-v0.1/",
         help="The path to the Mixtral model. The MLX model weights will also be saved there.",
@@ -43,6 +44,9 @@ if __name__ == "__main__":
 
     with open("params.json") as fid:
         args = json.load(fid)
+        args["model_type"] = "mixtral"
+    with open(model_path / "config.json", "w") as f:
+        json.dump(args, f, indent=4)
 
     torch_files = glob.glob(str(model_path / "consolidated.*.pt"))
     torch_files = sorted(torch_files, key=lambda tf: int(tf.split(".")[-2]))
