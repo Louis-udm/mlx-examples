@@ -223,56 +223,63 @@ def generate(prompt: mx.array, model: Mistral, temp: Optional[float] = 0.0):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Mistral inference script")
-    parser.add_argument(
-        "--model-path",
-        type=str,
-        default="mistral-7B-v0.1",
-        help="The path to the model weights and tokenizer",
-    )
-    parser.add_argument(
-        "--prompt",
-        help="The message to be processed by the model",
-        default="In the beginning the Universe was created.",
-    )
-    parser.add_argument(
-        "--max_tokens",
-        "-m",
-        type=int,
-        default=100,
-        help="Maximum number of tokens to generate",
-    )
-    parser.add_argument(
-        "--temp",
-        help="The sampling temperature.",
-        type=float,
-        default=1.0,
-    )
-    parser.add_argument(
-        "--tokens_per_eval",
-        help="The batch size of tokens to generate.",
-        type=int,
-        default=10,
-    )
-    parser.add_argument("--seed", type=int, default=0, help="The PRNG seed")
 
-    args = parser.parse_args()
+    temp=0.5
+    max_tokens=1000
+    # write_every=2
+    tokens_per_eval=2
+    seed=44
+    model_path = "../../weights/mistral-7B-v0.1"
 
-    args.model_path = "../../weights/" + args.model_path
+    prompt="""
+Extract the Request for Proposal requirements from the following markdown format text, merge every row to a requirement statement, and return a list in `requirements` field in `standard JSON format`.
 
-    mx.random.seed(args.seed)
+%%%%
+
+| ID   | Rated Requirement Description                                                                                                                                                                                                                           | Rating Criteria                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | Max Points    |
+|------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------|
+| R1.1 | The solution should provide written a  RPA strategic enterprise    implementation plan which will be  evaluated based on the following  marking scheme:   1.1 E- SDC infrastructure requirements;                                                       | 1 •  Information is well  documented / clear and  relevant to the subject – full  points per bullet  •  Information is semi  documented / unclear /  contains unrelated  information – half points per  bullet  .1 - ESDC infrastructure  requirements evaluation criteria   - includes relevant infrastructure  diagrams (Max 10 points)  - includes relevant infrastructure  hardware and software  requirements(Max 10 points)  - includes relevant costings and  firewall rule requirements(Max 10  points) | Max 30 points |
+| R1.2 | The solution should provide written a  RPA strategic enterprise    implementation plan which will be  evaluated based on the following  marking scheme:   1.2 - best practices for business and IT  RPA Centres of Expertise (CoE);                     | •  Information is well  documented / clear and  relevant to the subject – full  points per bullet  •  Information is semi  documented / unclear /  contains unrelated  information – half points per  bullet    1.2 -best practices for business  and IT RPA centres of expertise  (CoE);   - includes relevant best practices  for business RPA center of  excellence. (Max 10 points)  - includes relevant best practices  for IT RPA center of excellence.  (Max 10 points)                                  | Max 20 points |
+| R1.3 | 1 The solution should provide written a  RPA strategic enterprise    implementation plan which will be  evaluated based on the following  marking scheme:   .3 - business process evaluation and  creation of inventories of potential  RPA candidates; | •  Information is well  documented / clear and  relevant to the subject – full  points per bullet  •  Information is semi  documented / unclear /  contains unrelated  information – half points per  bullet                                                                                                                                                                                                                                                                                                    | Max 60 points |
+
+%%%%
+"""
+
+    prompt2="""
+Analyze the text contained by %%%% below. Within the text, locate the markdown table, provide the exact content found in the intersection of row 2 and column 4 in the table.
+
+%%%%
+# Animal employees
+We are **DreamAI**, we have 4 animal employees.
+## Detail infomations
+
+SEQ | Kind    |Name    |   Age| City
+----|---------|--------|------|----
+A1  | Dog    |Fred    |   2 |   Montreal
+A2  | Cat     |Jim     |   4 |   Toronto
+B1  | Snake   |Harry   |   3 |   Vancouver
+B2  | Bird   |Louis   |   5 |   Ottawa
+
+Our employees are welcome for you.
+
+## Brief
+Our employees are not working in offfice, they work from home.
+
+%%%%
+"""
+    mx.random.seed(seed)
     print("[INFO] Loading model from disk.")
-    model, tokenizer = load_model(args.model_path)
+    model, tokenizer = load_model(model_path)
 
     print("[INFO] Starting generation...")
 
-    print(args.prompt, end="", flush=True)
-    prompt = mx.array(tokenizer.encode(args.prompt))
+    print(prompt, end="", flush=True)
+    prompt = mx.array(tokenizer.encode(prompt))
     tokens = []
-    for token, _ in zip(generate(prompt, model, args.temp), range(args.max_tokens)):
+    for token, _ in zip(generate(prompt, model, temp), range(max_tokens)):
         tokens.append(token)
 
-        if (len(tokens) % args.tokens_per_eval) == 0:
+        if (len(tokens) % tokens_per_eval) == 0:
             mx.eval(tokens)
             s = tokenizer.decode([t.item() for t in tokens])
             print(s, end="", flush=True)

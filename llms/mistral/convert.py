@@ -17,6 +17,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    args.model_path="../../weights/"+args.model_path
     model_path = Path(args.model_path)
     state = torch.load(str(model_path / "consolidated.00.pth"))
     np.savez(
