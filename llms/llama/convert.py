@@ -137,7 +137,7 @@ if __name__ == "__main__":
 
     model_path = Path(args.model_path)
     weights, params = globals()[args.model_name](model_path)
-    model_path = Path(args.model_path+"-converted")
+    model_path = Path("weights/"+args.model_path+"-converted")
     model_path.mkdir(parents=True, exist_ok=True)
     params["model_type"] = "llama"
     np.savez(str(model_path / "weights.npz"), **weights)
