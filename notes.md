@@ -16,3 +16,8 @@ python mlx-examples/llama/llama.py CodeLlama-7b-Python-mlx/ CodeLlama-7b-Python-
 
 python convert.py --model-path TinyLlama/TinyLlama-1.1B-Chat-v0.6 --model-name tiny_llama
 python convert.py --model-path TTinyLlama/TinyLlama-1.1B-python-v0.1 --model-name tiny_llama
+
+
+python llama.py TinyLlama/TinyLlama-1.1B-Chat-v0.6-converted/ Llama-2-7b-chat-mlx/tokenizer.model --prompt "[INST] Generate a markdown table. [/INST]"
+
+python llama.py TinyLlama/TinyLlama-1.1B-Chat-v0.6-converted/ Llama-2-7b-chat-mlx/tokenizer.model --prompt "[INST] generate a markdown table and convert it to json. [/INST]"
