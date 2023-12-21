@@ -57,7 +57,7 @@ Extract the Request for Proposal requirements from the following text. Maintain 
 %%%%
 """
 
-prompt2="""
+prompt="""
 Analyze the text contained by %%%% below. Within the text, locate the markdown table, provide the exact content found in the intersection of row 3 and column 2 in the table.
 
 %%%%
