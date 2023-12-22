@@ -35,8 +35,8 @@ TinLlama >v0.2 uses a different prompt format
 """
 
 # model_path="llama/TinyLlama/TinyLlama-1.1B-Chat-v0.6-converted"
-model_path="llama/Llama-2-7b-chat-mlx"
-tokenizer_path="llama/Llama-2-7b-chat-mlx/tokenizer.model"
+model_path="../../weights/llama/Llama-2-7b-chat-mlx"
+tokenizer_path="../../weights/llama/Llama-2-7b-chat-mlx/tokenizer.model"
 
 tokenizer = SentencePieceProcessor(model_file=tokenizer_path)
 
@@ -78,6 +78,10 @@ Our employees are welcome for you.
 Our employees are not working in offfice, they work from home.
 
 %%%%
+"""
+
+prompt="""
+Alex took out 3 black balls from the box, Louis took out 4 red balls from the box, and Yassine gave Alex's balls to Louis. How many people took out the balls from the box? How many balls did Louis have in total?"
 """
 
 temp=0.8

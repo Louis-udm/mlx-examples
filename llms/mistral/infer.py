@@ -189,9 +189,10 @@ class Tokenizer:
         return out
 
 
-def load_model(folder: str, dtype=mx.float16):
-    model_path = Path(folder)
-    tokenizer = Tokenizer(str(model_path / "tokenizer.model"))
+def load_model(model_folder: str, tokenizer_folder, dtype=mx.float16):
+    model_path = Path(model_folder)
+    tokenizer_folder = Path(tokenizer_folder)
+    tokenizer = Tokenizer(str(tokenizer_folder / "tokenizer.model"))
     with open(model_path / "config.json", "r") as f:
         config = json.loads(f.read())
         config.pop("sliding_window", None)
@@ -225,11 +226,13 @@ def generate(prompt: mx.array, model: Mistral, temp: Optional[float] = 0.0):
 if __name__ == "__main__":
 
     temp=0.5
-    max_tokens=1000
+    max_tokens=100
     # write_every=2
     tokens_per_eval=2
     seed=44
+    tokenizer_path="../../weights/mistral-7B-v0.1"
     model_path = "../../weights/mistral-7B-v0.1"
+    # tokenizer_path="../../weights/mistral-7B-v0.1"
 
     prompt="""
 Extract the Request for Proposal requirements from the following markdown format text, merge every row to a requirement statement, and return a list in `requirements` field in `standard JSON format`.
@@ -267,9 +270,14 @@ Our employees are not working in offfice, they work from home.
 
 %%%%
 """
+
+    conversation = f"SYSTEM: Elaborate on the topic using a Tree of Thoughts and backtrack when necessary to construct a clear, cohesive Chain of Thought reasoning. Always answer without hesitation."
+
+    prompt = f"{conversation} \nUSER: Alex took out 3 black balls from the box, Louis took out 4 red balls from the box, and Yassine gave Alex's balls to Louis. How many people took out the balls from the box? How many balls did Louis have in total? \nASSISTANT: "
+    
     mx.random.seed(seed)
     print("[INFO] Loading model from disk.")
-    model, tokenizer = load_model(model_path)
+    model, tokenizer = load_model(model_path, tokenizer_path)
 
     print("[INFO] Starting generation...")
 
