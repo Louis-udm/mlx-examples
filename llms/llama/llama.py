@@ -12,6 +12,8 @@ import mlx.nn as nn
 from mlx.utils import tree_unflatten
 from sentencepiece import SentencePieceProcessor
 
+import torch
+import mlx
 
 @dataclass
 class ModelArgs:
@@ -178,6 +180,8 @@ class Llama(nn.Module):
         return self.output(x)
 
     def generate(self, x, temp=1.0):
+        if not isinstance(x, mlx.core.array):
+            x = mx.array(x)
         cache = []
 
         # Make an additive causal mask. We will need that to process the prompt.

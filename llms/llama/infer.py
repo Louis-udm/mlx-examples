@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import Optional, Tuple, List
 from sentencepiece import SentencePieceProcessor
 import time
+from transformers import AutoTokenizer
 
 import mlx.core as mx
 import mlx.nn as nn
@@ -36,7 +37,12 @@ TinLlama >v0.2 uses a different prompt format
 
 # model_path="llama/TinyLlama/TinyLlama-1.1B-Chat-v0.6-converted"
 model_path="../../weights/llama/Llama-2-7b-chat-mlx"
+if not Path(model_path).exists():
+    model_path=model_path.replace("../","")
+
 tokenizer_path="../../weights/llama/Llama-2-7b-chat-mlx/tokenizer.model"
+if not Path(tokenizer_path).exists():
+    tokenizer_path=tokenizer_path.replace("../","")
 
 tokenizer = SentencePieceProcessor(model_file=tokenizer_path)
 
@@ -87,6 +93,7 @@ Alex took out 3 black balls from the box, Louis took out 4 red balls from the bo
 temp=0.8
 max_tokens=1000
 write_every=2
+trf_tokenizer = AutoTokenizer.from_pretrained("NousResearch/Llama-2-7b-chat-hf")
 
 print("------")
 print(prompt)
@@ -104,9 +111,10 @@ for token in model.generate(x, temp):
         mx.eval(token)
         prompt_processing = toc("Prompt processing", start)
 
-    if len(tokens) >= max_tokens:
+    if [t[0] for t in tokens[-5:]] == [13]*5: # 5 newlines
         break
-
+    elif len(tokens) >= max_tokens:
+        break
     elif (len(tokens) % write_every) == 0:
         # It is perfectly ok to eval things we have already eval-ed.
         mx.eval(tokens)
@@ -116,9 +124,9 @@ for token in model.generate(x, temp):
 
 mx.eval(tokens)
 full_gen = toc("Full generation", start)
-s = tokenizer.decode([t.item() for t in tokens])
-print(s[skip:], flush=True)
+s = trf_tokenizer.decode([t.item() for t in tokens])
 print("------")
+print(s)
 print(prompt_processing)
 print(full_gen)
 
