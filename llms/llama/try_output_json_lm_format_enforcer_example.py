@@ -18,7 +18,7 @@ StringOrManyStrings = Union[str, List[str]]
 import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-model_id = "TheBloke/Llama-2-7b-Chat-GPTQ"
+model_id = "NousResearch/Llama-2-7b-chat-hf"
 device = "cuda"
 
 if torch.cuda.is_available():
@@ -117,16 +117,7 @@ def run(
 
 
 from pydantic import BaseModel
-from IPython.display import display, Markdown
 from typing import List
-
-
-def display_header(text):
-    display(Markdown(f"**{text}**"))
-
-
-def display_content(text):
-    display(Markdown(f"```\n{text}\n```"))
 
 
 DEFAULT_SYSTEM_PROMPT = """\
@@ -145,34 +136,37 @@ class AnswerFormat(BaseModel):
 question = "Please give me information about Michael Jordan. You MUST answer using the following json schema: "
 question_with_schema = f"{question}{AnswerFormat.schema_json()}"
 
-display_header("Question:")
-display_content(question_with_schema)
+print("Question:")
+print(question_with_schema)
 
-display_header("Answer, With json schema enforcing:")
-result, enforced_scores = run(
-    question_with_schema,
-    system_prompt=DEFAULT_SYSTEM_PROMPT,
-    max_new_tokens=DEFAULT_MAX_NEW_TOKENS,
-    required_json_schema=AnswerFormat.schema(),
-)
-display_content(result)
-
-display_header("Answer, Without json schema enforcing:")
-result, _ = run(
-    question_with_schema,
-    system_prompt=DEFAULT_SYSTEM_PROMPT,
-    max_new_tokens=DEFAULT_MAX_NEW_TOKENS,
-)
-display_content(result)
-
-display_header("Answer, With json mode enforcing (json output, schemaless):")
+print("Answer, With json mode enforcing (json output, schemaless):")
 result, _ = run(
     question_with_schema,
     system_prompt=DEFAULT_SYSTEM_PROMPT,
     max_new_tokens=DEFAULT_MAX_NEW_TOKENS,
     required_json_output=True,
 )
-display_content(result)
+print("----final result-----")
+print(result)
+
+print("Answer, With json schema enforcing:")
+result, enforced_scores = run(
+    question_with_schema,
+    system_prompt=DEFAULT_SYSTEM_PROMPT,
+    max_new_tokens=DEFAULT_MAX_NEW_TOKENS,
+    required_json_schema=AnswerFormat.schema(),
+)
+print("----final result-----")
+print(result)
+
+# print("Answer, Without json schema enforcing:")
+# result, _ = run(
+#     question_with_schema,
+#     system_prompt=DEFAULT_SYSTEM_PROMPT,
+#     max_new_tokens=DEFAULT_MAX_NEW_TOKENS,
+# )
+# print(result)
+
 
 
 # output
