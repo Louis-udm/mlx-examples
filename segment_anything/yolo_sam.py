@@ -29,8 +29,8 @@ img, img_path = load_img(0)
 results=model(img_path)
 
 res = results[0].plot()
-# cv2.imshow("YOLOv8 Inference", res)
-# cv2.waitKey(0)
+cv2.imshow("YOLOv8 Inference", res)
+cv2.waitKey(0)
 texts=ocr_text_from_yolo_results(results)
 print("\n".join(texts))
 
