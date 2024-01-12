@@ -1,0 +1,13 @@
+train: /Users/zlu/Projects/mlx-examples/segment_anything/images/tabulation.v3i.yolov8/train/images
+val: /Users/zlu/Projects/mlx-examples/segment_anything/images/tabulation.v3i.yolov8/valid/images
+
+
+nc: 3
+names: ['cell', 'head', 'tabulation']
+
+roboflow:
+  workspace: zhibinlu
+  project: tabulation
+  version: 3
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/zhibinlu/tabulation/dataset/3
